@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Scanner;
 import java.util.TreeMap;
 
-import riSystem.Filters.*;;
+import riSystem.Filters.*;
 
 public class RISystem  {
 
@@ -36,17 +36,17 @@ public class RISystem  {
 		try(BufferedReader brPalabras = new BufferedReader(new FileReader("palabras vacias.txt"))){  
 		
 			String pVacia;
-			while((pVacia=brPalabras.readLine())!=null){
+			while((pVacia = brPalabras.readLine()) != null) {
+
 				t.add(pVacia);
 			}
 		}
-		
 		String texto = "", textoFiltrado = "";
 		int nArchivos=0; //para el idf
 		
-		
 		if(f.isDirectory()){
-			System.out.println(f+"\n----------------Creando indice invertido----------------");
+			System.out.println("\n----------------Creando indice invertido----------------");
+
 			for(File file:f.listFiles()){
 				texto = new String(Files.readAllBytes(Paths.get(file.getPath())));
 				textoFiltrado = manejaFiltros.execute(texto);
@@ -56,12 +56,13 @@ public class RISystem  {
 				array=Division.execute(textoFiltrado);
 				array=t.execute(array);//palabras vacias
 				
-				System.out.println(nArchivos);
-				
 				Stem st=new Stem();
 				
 				st.execute(array);//stemmer
 				
+				Umbral umbral = new Umbral(array);
+				umbral.execute();
+
 				Contador ct = new Contador();
 				HashMap<String, Integer> map=new HashMap<String, Integer>();
 				map=ct.execute(array);
@@ -71,9 +72,6 @@ public class RISystem  {
 			System.out.println("\n----------------"+nArchivos +" archivos leidos----------------\n");
 		}
 		
-		
-		
-		//HashMap<String,Tupla> tfidf=new HashMap<String,Tupla>();
 		TF.calculaIDF(nArchivos);
 		Recupera.guardaIndice(TF.getIndice());
 		TF.setIndice(TF.getIndice());
@@ -81,18 +79,14 @@ public class RISystem  {
 	    System.out.println("----------------Calculando longitudes----------------");
 		TF.vector(TF.getIndice());
 		Recupera.guardaLongitud(TF.getLong());
-		
-		/*TF.setIndice(new HashMap<String,Tupla>());
-		TF.setLong(new HashMap<String,Double>());*/
-		
-		
+				
 		
 	}
 
 	public void buscar(String terminos,int nRes) throws IOException{
 		
 		HashMap<String,Tupla> tfidf=TF.getIndice();
-		HashMap<String,Double> vector=TF.getLong();
+		HashMap<String,Double> pesos=TF.getLong();
 		
 		ArrayList<String> busqueda;		
 		busqueda=Division.execute(terminos);
@@ -100,7 +94,7 @@ public class RISystem  {
 		HashMap<String,Double> puntuacion=new HashMap<String,Double>();
 		
 		
-		for(String doc:vector.keySet()){
+		for(String doc:pesos.keySet()){
 			puntuacion.put(doc,0.0);//meto en puntuacion todos los documentos clave del vector
 		}
 		
@@ -119,7 +113,7 @@ public class RISystem  {
 					
 					if(t.containsKey(doc)){//compruebo que el termino esta en el documento actual
 						double punt=puntuacion.get(doc);
-						puntuacion.put(doc, punt+(idf*idf*t.get(doc)/vector.get(doc)));
+						puntuacion.put(doc, punt+(idf*idf*t.get(doc)/pesos.get(doc)));
 					}
 				}	
 			}
@@ -155,11 +149,8 @@ public class RISystem  {
 		
 		TF.getIndice().clear();
 		TF.getLong().clear();
-		System.out.println(TF.getIndice());
-		System.out.println(TF.getLong());
 				
 		long inicio = System.currentTimeMillis();
-				
 		ri.index();
 
 		long fin = System.currentTimeMillis() - inicio;
@@ -182,7 +173,7 @@ public class RISystem  {
 					System.out.print("Introduzca cuantos resultados desea: ");
 					int n= _reader.nextInt();
 				
-					System.out.println("#####Buscando '"+terminos+"' en "+f);
+					System.out.println("---------------- Buscando '" + terminos + "' en " + f + " ----------------");
 				
 					ri.buscar(terminos,n);
 				

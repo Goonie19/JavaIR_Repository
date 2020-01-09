@@ -17,11 +17,6 @@ public class TF {
 	
 	public static void setLong(HashMap<String,Double> longitudes){ mapPesos = longitudes; }
 	
-	/**
-	 * Calcula los pesos de la palabra en el documento
-	 * @param map Pareja que tiene la palabra y el numero de veces que aparece en el documento f
-	 * @param f Documento en el que aparece la palabra
-	 */
 	public static void execute(Map<String, Integer> map, String f){
 		
 		HashMap<String,Double> pesoDocumento;
@@ -46,9 +41,6 @@ public class TF {
 		
 	}
 	
-	/**
-	 * @param nFiles Numero de documentos totales
-	 */
 	public static void calculaIDF(int nFiles){
 		 
 		for(String p : indiceInvertido.keySet()){
@@ -58,10 +50,6 @@ public class TF {
 	    }
 	}
 	
-	/**
-	 * Calcula el vector de longitudes de los documentos
-	 * @param Indice Indice invertido con los TF
-	 */
 	public static void vector(HashMap<String,Tupla> Indice){
 		
 		double peso;

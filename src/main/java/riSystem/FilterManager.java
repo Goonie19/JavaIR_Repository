@@ -9,9 +9,7 @@ public class FilterManager {
 	public FilterManager(){
 		filters=new ArrayList<GenFilter>();
 	}
-	/**A�ade un filtro al arraylist
-	 * @param gf
-	 */
+	
 	public void add(GenFilter gf){
 		filters.add(gf);
 	}
