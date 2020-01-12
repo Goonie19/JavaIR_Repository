@@ -66,22 +66,18 @@ public class Recupera {
 	
 	public static HashMap<String,Tupla> cargaIndice() throws IOException{
 		HashMap<String,Tupla> indice = new HashMap<String,Tupla>();
-		System.out.println("---------------- Cargando indice ----------------");
 		FileReader in = new FileReader("indice.txt");
 	    BufferedReader br = new BufferedReader(in);
 
-	    
 	    String value=br.readLine();
 	    
 	    in.close();
 		
 		value = value.substring(1, value.length()-1); //elimina las llaves   
-		//System.out.println("sin llaves: "+value);
 		String[] keyValuePairs = value.split(" , ");                           
 		
 		for(String t:keyValuePairs){
 			
-			//System.out.println("tupla: "+t);
 			String[] parejas=t.split(" - ");
 			
 			String[] termIDF=parejas[0].split("=");
