@@ -91,30 +91,28 @@ public class RISystem {
 
 	}
 
-	public static HashMap<String, Double> recuperarTFIDF(ArrayList<String> vectorTerminos,
+	public static HashMap<String, Double> calcularTFIDF(ArrayList<String> vectorTerminos,
 			HashMap<String, Tupla> indiceInvertido, HashMap<String, Double> longitudDocumento) {
 		double tf, idf, tfIdfTotal;
-		HashMap<String, Double> peso = new HashMap<>();
-		for (String termino : vectorTerminos) { // Recorremos el vector de terminos de la consulta actual
-			if (indiceInvertido.containsKey(termino)) { // En el indice invertido buscamos si esta nuestro termino
-														// actual
-				idf = indiceInvertido.get(termino).getIDF(); // guardamos su idf
+		HashMap<String, Double> puntos = new HashMap<>();
+		for (String termino : vectorTerminos) { 
+			if (indiceInvertido.containsKey(termino)) { //Comprueba que esta el termino en el indice
+				idf = indiceInvertido.get(termino).getIDF(); 
 				for (String idDocumento : indiceInvertido.get(termino).docPeso().keySet()) {
 					
-					tf = indiceInvertido.get(termino).docPeso().get(idDocumento); // obtenemos el peso del documento o
-																					// tf
-					if (peso.containsKey(idDocumento))
-						tfIdfTotal = peso.get(idDocumento) + tf * Math.pow(idf, 2);
+					tf = indiceInvertido.get(termino).docPeso().get(idDocumento); // obtenemos el tf
+					if (puntos.containsKey(idDocumento))
+						tfIdfTotal = puntos.get(idDocumento) + tf * Math.pow(idf, 2);
 					else
 						tfIdfTotal = tf * Math.pow(idf, 2);
-					peso.put(idDocumento, tfIdfTotal);
+					puntos.put(idDocumento, tfIdfTotal);
 				}
 			}
 		}
 
-		for (String idDocumento : peso.keySet()) // hay que hacerlo a parte ya que hay que hacer toda la suma entera
-			peso.put(idDocumento, peso.get(idDocumento) / longitudDocumento.get(idDocumento));
-		return peso;
+		for (String idDocumento : puntos.keySet()) 
+			puntos.put(idDocumento, puntos.get(idDocumento) / longitudDocumento.get(idDocumento));
+		return puntos;
 	}
 
 	private static HashMap<String, Double> sortByComparator(HashMap<String, Double> unsortMap, final boolean order)
@@ -190,7 +188,7 @@ public class RISystem {
 		Umbral umbral = new Umbral(busqueda);
 		umbral.execute();
 		
-		puntuacion = recuperarTFIDF(busqueda, indiceInv, pesos);
+		puntuacion = calcularTFIDF(busqueda, indiceInv, pesos);
 
 		HashMap<String, Double> ordenado = sortByComparator(puntuacion, false);
 		
