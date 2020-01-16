@@ -161,23 +161,26 @@ public class RISystem {
 
 		HashMap<String,Double> puntuacion=new HashMap<String,Double>();
 
-		for (String termino : busqueda) { // Recorremos el vector de terminos de la consulta actual
+		for (String termino : busqueda) { 
+
 			if (indiceInv.containsKey(termino)) { 
-				idf = indiceInv.get(termino).getIDF(); // guardamos su idf
+
+				idf = indiceInv.get(termino).getIDF(); 
 				for (String idDocumento : indiceInv.get(termino).docPeso().keySet()) {
 					
-					tf = indiceInv.get(termino).docPeso().get(idDocumento); // obtenemos el peso del documento o
-																					// tf
+					tf = indiceInv.get(termino).docPeso().get(idDocumento); 
+
 					if (puntuacion.containsKey(idDocumento))
 						tfIdfTotal = puntuacion.get(idDocumento) + tf * Math.pow(idf, 2);
 					else
 						tfIdfTotal = tf * Math.pow(idf, 2);
+						
 					puntuacion.put(idDocumento, tfIdfTotal);
 				}
 			}
 		}
 
-		for (String idDocumento : puntuacion.keySet()) // hay que hacerlo a parte ya que hay que hacer toda la suma entera
+		for (String idDocumento : puntuacion.keySet()) 
 			puntuacion.put(idDocumento, puntuacion.get(idDocumento) / pesos.get(idDocumento));
 
 		HashMap<String, Double> ordenado = sortByComparator(puntuacion, false);

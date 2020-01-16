@@ -28,7 +28,6 @@ public class Recupera {
 		
 	public static HashMap<String,Double> cargaVector() throws IOException{
 		HashMap<String,Double> vector=new HashMap<>();
-		System.out.println("---------------- Cargando longitudes ----------------");
 		FileReader in = new FileReader("peso.txt");
 	    BufferedReader br = new BufferedReader(in);
 
@@ -45,7 +44,6 @@ public class Recupera {
 		    String[] entry = pair.split("=");//Separa la clave del valor
 		    vector.put(entry[0].trim(), Double.parseDouble(entry[1].trim()));//mete la pareja de documento y peso. Double.parseDouble(String s)->convierte cadena a double
 		}
-		System.out.println("---------------- Longitudes cargadas ----------------");
 		return vector;
 	}
 	
@@ -82,12 +80,10 @@ public class Recupera {
 			
 			String[] termIDF=parejas[0].split("=");
 			
-			
-				indice.put(termIDF[0], new Tupla(Double.parseDouble(termIDF[1]),cargaVector2(parejas[1])));
+			indice.put(termIDF[0], new Tupla(Double.parseDouble(termIDF[1]),cargaVector2(parejas[1])));
 			
 		}
 		
-		System.out.println("---------------- Indice cargado ----------------");
 		return indice;
 	}
 }
