@@ -2,10 +2,8 @@ package riSystem;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -15,11 +13,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
-import java.util.TreeMap;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 import riSystem.Filters.*;
 
@@ -89,33 +84,7 @@ public class RISystem {
 		TF.vector(TF.getIndice());
 		Recupera.guardaLongitud(TF.getLong());
 
-	}
-
-	public static HashMap<String, Double> recuperarTFIDF(ArrayList<String> vectorTerminos,
-			HashMap<String, Tupla> indiceInvertido, HashMap<String, Double> longitudDocumento) {
-		double tf, idf, tfIdfTotal;
-		HashMap<String, Double> peso = new HashMap<>();
-		for (String termino : vectorTerminos) { // Recorremos el vector de terminos de la consulta actual
-			if (indiceInvertido.containsKey(termino)) { // En el indice invertido buscamos si esta nuestro termino
-														// actual
-				idf = indiceInvertido.get(termino).getIDF(); // guardamos su idf
-				for (String idDocumento : indiceInvertido.get(termino).docPeso().keySet()) {
-					
-					tf = indiceInvertido.get(termino).docPeso().get(idDocumento); // obtenemos el peso del documento o
-																					// tf
-					if (peso.containsKey(idDocumento))
-						tfIdfTotal = peso.get(idDocumento) + tf * Math.pow(idf, 2);
-					else
-						tfIdfTotal = tf * Math.pow(idf, 2);
-					peso.put(idDocumento, tfIdfTotal);
-				}
-			}
-		}
-
-		for (String idDocumento : peso.keySet()) // hay que hacerlo a parte ya que hay que hacer toda la suma entera
-			peso.put(idDocumento, peso.get(idDocumento) / longitudDocumento.get(idDocumento));
-		return peso;
-	}
+	}	
 
 	private static HashMap<String, Double> sortByComparator(HashMap<String, Double> unsortMap, final boolean order)
     {
@@ -153,12 +122,10 @@ public class RISystem {
 
 	public void buscar(String terminos,int nRes) throws IOException {
 		
-		HashMap<String,Tupla> indiceInv=Recupera.cargaIndice();
-		HashMap<String,Double> pesos=Recupera.cargaVector();
-		
+		HashMap<String,Tupla> indiceInv=Recupera.cargaIndice();		
+		HashMap<String,Double> pesos = Recupera.cargaVector();
 		ArrayList<String> busqueda;		
 
-		HashMap<String,Double> puntuacion=new HashMap<String,Double>();
 
 		FilterManager manejaFiltros = new FilterManager();
 		
@@ -189,8 +156,29 @@ public class RISystem {
 				
 		Umbral umbral = new Umbral(busqueda);
 		umbral.execute();
-		
-		puntuacion = recuperarTFIDF(busqueda, indiceInv, pesos);
+
+		double tf, idf, tfIdfTotal;
+
+		HashMap<String,Double> puntuacion=new HashMap<String,Double>();
+
+		for (String termino : busqueda) { // Recorremos el vector de terminos de la consulta actual
+			if (indiceInv.containsKey(termino)) { 
+				idf = indiceInv.get(termino).getIDF(); // guardamos su idf
+				for (String idDocumento : indiceInv.get(termino).docPeso().keySet()) {
+					
+					tf = indiceInv.get(termino).docPeso().get(idDocumento); // obtenemos el peso del documento o
+																					// tf
+					if (puntuacion.containsKey(idDocumento))
+						tfIdfTotal = puntuacion.get(idDocumento) + tf * Math.pow(idf, 2);
+					else
+						tfIdfTotal = tf * Math.pow(idf, 2);
+					puntuacion.put(idDocumento, tfIdfTotal);
+				}
+			}
+		}
+
+		for (String idDocumento : puntuacion.keySet()) // hay que hacerlo a parte ya que hay que hacer toda la suma entera
+			puntuacion.put(idDocumento, puntuacion.get(idDocumento) / pesos.get(idDocumento));
 
 		HashMap<String, Double> ordenado = sortByComparator(puntuacion, false);
 		
