@@ -24,6 +24,20 @@ public class RISystem {
 
 	private static Scanner _reader;
 
+	HashMap<String,Tupla> indiceInv;		
+	HashMap<String,Double> pesos;
+
+	public RISystem() throws IOException{
+		try {
+			indiceInv = Recupera.cargaIndice();
+			pesos = Recupera.cargaVector();
+		} catch(Exception e) {
+			System.out.println("El indice no existe, necesita indexar primero");
+			indiceInv = new HashMap<String,Tupla>();
+			pesos = new HashMap<String,Double>();
+		}
+	}
+
 	public void index() throws IOException {
 
 		FilterManager manejaFiltros = new FilterManager();
@@ -35,7 +49,7 @@ public class RISystem {
 		manejaFiltros.add(new Minus());
 
 		ArrayList<String> array;
-		Terminos t = new Terminos();// para quitar palabras vacias
+		Terminos t = new Terminos();// para palabras vacias
 
 		try (BufferedReader brPalabras = new BufferedReader(new FileReader("palabras vacias.txt"))) {
 
@@ -46,7 +60,7 @@ public class RISystem {
 			}
 		}
 		String texto = "", textoFiltrado = "";
-		int nArchivos = 0; // para el idf
+		int nArchivos = 0; 
 
 		if (f.isDirectory()) {
 			System.out.println("\n----------------Creando indice invertido----------------");
@@ -122,10 +136,13 @@ public class RISystem {
 
 	public void buscar(String terminos,int nRes) throws IOException {
 		
-		HashMap<String,Tupla> indiceInv=Recupera.cargaIndice();		
-		HashMap<String,Double> pesos = Recupera.cargaVector();
-		ArrayList<String> busqueda;		
+		if(indiceInv.isEmpty())
+			indiceInv = Recupera.cargaIndice();
 
+		if(pesos.isEmpty())
+			pesos = Recupera.cargaVector();
+
+		ArrayList<String> busqueda;		
 
 		FilterManager manejaFiltros = new FilterManager();
 		
